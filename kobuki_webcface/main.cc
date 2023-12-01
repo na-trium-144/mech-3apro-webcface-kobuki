@@ -12,7 +12,7 @@
 class KobukiManager {
   public:
     KobukiManager(const std::string &device)
-        : dx(0), dth(0), length(0.1), pose(), wcli("kobuki"),
+        : pose(), wcli("kobuki"),
           slot_button_event(&KobukiManager::processButtonEvent, *this),
           slot_stream_data(&KobukiManager::processStreamData, *this),
           slot_debug(&KobukiManager::logCustomDebug, *this),
@@ -63,7 +63,38 @@ class KobukiManager {
         wcli.value("button/1") = 0;
         wcli.value("button/2") = 0;
 
+        wcli.func("baseControl")
+            .set([this](double l, double r) {
+                if (kobuki.isEnabled()) {
+                    kobuki.setBaseControl(l, r);
+                }
+            })
+            .setArgs({webcface::Arg("linear"), webcface::Arg("angular")});
+        updateView();
         wcli.start();
+    }
+    void emergencyOn() {
+        kobuki.setBaseControl(0, 0);
+        kobuki.disable();
+        updateView();
+    }
+    void emergencyOff() {
+        kobuki.enable();
+        updateView();
+    }
+    void updateView() {
+        using namespace webcface::ViewComponents;
+        using namespace webcface;
+        auto v = wcli.view("emergency");
+
+        v << button("緊急停止", [this] {
+                 emergencyOn();
+             }).bgColor(ViewColor::red);
+        v << (kobuki.isEnabled() ? text(" off").textColor(ViewColor::green)
+                                 : text(" on").textColor(ViewColor::red))
+          << std::endl;
+        v << button("解除", [this] { emergencyOff(); });
+        v.sync();
     }
 
     ~KobukiManager() {
@@ -133,27 +164,6 @@ class KobukiManager {
         wcli.value("pose/y") = pose[1];
         wcli.value("pose/th") = pose[2];
         wcli.sync();
-        // processMotion();
-    }
-    // Generate square motion
-    void processMotion() {
-        const double buffer = 0.05;
-        double longitudinal_velocity = 0.0;
-        double rotational_velocity = 0.0;
-        if (dx >= (length) && dth >= ecl::pi / 2.0) {
-            std::cout << "[Z] ";
-            dx = 0.0;
-            dth = 0.0;
-        } else if (dx >= (length + buffer)) {
-            std::cout << "[R] ";
-            rotational_velocity = 1.1;
-        } else {
-            std::cout << "[L] ";
-            longitudinal_velocity = 0.3;
-        }
-        std::cout << "[dx: " << dx << "][dth: " << dth << "][" << pose[0]
-                  << ", " << pose[1] << ", " << pose[2] << "]" << std::endl;
-        kobuki.setBaseControl(longitudinal_velocity, rotational_velocity);
     }
 
   private:
@@ -163,8 +173,6 @@ class KobukiManager {
     ecl::Slot<> slot_stream_data;
     ecl::Slot<const std::string &> slot_debug, slot_info, slot_warning,
         slot_error;
-    double dx, dth;
-    const double length;
     ecl::linear_algebra::Vector3d pose; // x, y, heading
 };
 
