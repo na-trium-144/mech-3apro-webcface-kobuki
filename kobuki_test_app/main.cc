@@ -13,7 +13,11 @@ class KobukiManager {
     KobukiManager(const std::string &device)
         : dx(0), dth(0), length(0.1),
           slot_button_event(&KobukiManager::processButtonEvent, *this),
-          slot_stream_data(&KobukiManager::processStreamData, *this) {
+          slot_stream_data(&KobukiManager::processStreamData, *this),
+          slot_debug(&KobukiManager::logCustomDebug, *this),
+          slot_info(&KobukiManager::logCustomInfo, *this),
+          slot_warning(&KobukiManager::logCustomWarning, *this),
+          slot_error(&KobukiManager::logCustomError, *this) {
         kobuki::Parameters parameters;
         // Specify the device port, default: /dev/kobuki
         parameters.device_port = device;
@@ -34,6 +38,15 @@ class KobukiManager {
         parameters.battery_low = 14.0;
         parameters.battery_dangerous = 13.2;
 
+        // Disable the default loggers
+        parameters.log_level = kobuki::LogLevel::NONE;
+
+        // Wire them up ourselves
+        slot_debug.connect(parameters.sigslots_namespace + "/debug");
+        slot_info.connect(parameters.sigslots_namespace + "/info");
+        slot_warning.connect(parameters.sigslots_namespace + "/warning");
+        slot_error.connect(parameters.sigslots_namespace + "/error");
+
         // Initialise - exceptions are thrown if parameter validation or
         // initialisation fails.
         // try {
@@ -51,7 +64,25 @@ class KobukiManager {
             0, 0); // linear_velocity, angular_velocity in (m/s), (rad/s)
         kobuki.disable();
     }
+    void logCustomDebug(const std::string &message) {
+        std::cout << ecl::green << "[DEBUG_WITH_COLANDERS] " << message
+                  << ecl::reset << std::endl;
+    }
 
+    void logCustomInfo(const std::string &message) {
+        std::cout << "[INFO_WITH_COLANDERS] " << message << ecl::reset
+                  << std::endl;
+    }
+
+    void logCustomWarning(const std::string &message) {
+        std::cout << ecl::yellow << "[WARNING_WITH_COLANDERS] " << message
+                  << ecl::reset << std::endl;
+    }
+
+    void logCustomError(const std::string &message) {
+        std::cout << ecl::red << "[ERROR_WITH_COLANDERS] " << message
+                  << ecl::reset << std::endl;
+    }
     /*
      * Nothing to do in the main thread, just put it to sleep
      */
@@ -102,7 +133,8 @@ class KobukiManager {
         // std::cout << kobuki.getHeading() << ", " << pose.heading() <<
         // std::endl; std::cout << "[" << pose[0] << ", " << pose.y() << ", " <<
         // pose.heading() << "]" << std::endl;
-        processMotion();
+
+        // processMotion();
     }
     // Generate square motion
     void processMotion() {
@@ -131,6 +163,8 @@ class KobukiManager {
     kobuki::Kobuki kobuki;
     ecl::Slot<const kobuki::ButtonEvent &> slot_button_event;
     ecl::Slot<> slot_stream_data;
+    ecl::Slot<const std::string &> slot_debug, slot_info, slot_warning,
+        slot_error;
     double dx, dth;
     const double length;
     ecl::linear_algebra::Vector3d pose; // x, y, heading

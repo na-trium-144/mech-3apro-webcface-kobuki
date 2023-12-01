@@ -15,7 +15,8 @@ sudo mv dist /usr/local/share/webcface/dist
 ```
 
 ## kobuki
-https://kobuki.readthedocs.io/en/devel/software.html
+* [install](https://kobuki.readthedocs.io/en/devel/software.html)
+* [creating app](https://kobuki.readthedocs.io/en/devel/applications.html)
 ```sh
 sudo apt install python3.8-venv
 cd kobuki
