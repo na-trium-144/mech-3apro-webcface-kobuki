@@ -7,7 +7,7 @@ cd webcface
 CC=gcc-10 CXX=g++-10 cmake -Bbuild
 make -Cbuild -j8
 sudo make -Cbuild install
-curl -LO https://github.com/na-trium-144/webcface-webui/releases/download/v1.0.7/webcface-webui_1.0.7.tar.gz
+curl -LO https://github.com/na-trium-144/webcface-webui/releases/download/v1.0.10/webcface-webui_1.0.10.tar.gz
 tar zxvf webcface-webui*.tar.gz
 sudo rm -rf /usr/local/share/webcface
 sudo mkdir /usr/local/share/webcface
