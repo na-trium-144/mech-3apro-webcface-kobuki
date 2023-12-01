@@ -11,4 +11,6 @@ target_link_libraries(main PRIVATE
 	kobuki_core
 	ecl_threads
 	ecl_time
+	ecl_geometry
+	ecl_exceptions
 )

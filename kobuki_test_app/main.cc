@@ -1,14 +1,18 @@
 #include <iostream>
 #include <string>
-// #include <ecl/time.hpp>
+#include <csignal>
+#include <ecl/time.hpp>
 // #include <ecl/command_line.hpp>
 #include <ecl/sigslots.hpp>
+#include <ecl/linear_algebra.hpp>
+#include <ecl/geometry.hpp>
 #include <kobuki_core/kobuki.hpp>
 
 class KobukiManager {
   public:
     KobukiManager(const std::string &device)
-        : slot_button_event(&KobukiManager::processButtonEvent, *this),
+        : dx(0), dth(0), length(0.1),
+          slot_button_event(&KobukiManager::processButtonEvent, *this),
           slot_stream_data(&KobukiManager::processStreamData, *this) {
         kobuki::Parameters parameters;
         // Specify the device port, default: /dev/kobuki
@@ -41,6 +45,13 @@ class KobukiManager {
         slot_button_event.connect("/kobuki/button_event");
         slot_stream_data.connect("/kobuki/stream_data");
     }
+
+    ~KobukiManager() {
+        kobuki.setBaseControl(
+            0, 0); // linear_velocity, angular_velocity in (m/s), (rad/s)
+        kobuki.disable();
+    }
+
     /*
      * Nothing to do in the main thread, just put it to sleep
      */
@@ -78,16 +89,55 @@ class KobukiManager {
      * Up to you from here to process it.
      */
     void processStreamData() {
-        kobuki::CoreSensors::Data data = kobuki.getCoreSensorData();
-        std::cout << "Encoders [" << data.left_encoder << ","
-                  << data.right_encoder << "]" << std::endl;
+        // kobuki::CoreSensors::Data data = kobuki.getCoreSensorData();
+        // std::cout << "Encoders [" << data.left_encoder << ","
+        //           << data.right_encoder << "]" << std::endl;
+        ecl::linear_algebra::Vector3d pose_update;
+        ecl::linear_algebra::Vector3d pose_update_rates;
+        kobuki.updateOdometry(pose_update, pose_update_rates);
+        ecl::concatenate_poses(pose, pose_update);
+        dx += pose_update[0];  // x
+        dth += pose_update[2]; // heading
+        // std::cout << dx << ", " << dth << std::endl;
+        // std::cout << kobuki.getHeading() << ", " << pose.heading() <<
+        // std::endl; std::cout << "[" << pose[0] << ", " << pose.y() << ", " <<
+        // pose.heading() << "]" << std::endl;
+        processMotion();
     }
+    // Generate square motion
+    void processMotion() {
+        const double buffer = 0.05;
+        double longitudinal_velocity = 0.0;
+        double rotational_velocity = 0.0;
+        if (dx >= (length) && dth >= ecl::pi / 2.0) {
+            std::cout << "[Z] ";
+            dx = 0.0;
+            dth = 0.0;
+        } else if (dx >= (length + buffer)) {
+            std::cout << "[R] ";
+            rotational_velocity = 1.1;
+        } else {
+            std::cout << "[L] ";
+            longitudinal_velocity = 0.3;
+        }
+        std::cout << "[dx: " << dx << "][dth: " << dth << "][" << pose[0]
+                  << ", " << pose[1] << ", " << pose[2] << "]" << std::endl;
+        kobuki.setBaseControl(longitudinal_velocity, rotational_velocity);
+    }
+
+    const ecl::linear_algebra::Vector3d &getPose() { return pose; }
 
   private:
     kobuki::Kobuki kobuki;
     ecl::Slot<const kobuki::ButtonEvent &> slot_button_event;
     ecl::Slot<> slot_stream_data;
+    double dx, dth;
+    const double length;
+    ecl::linear_algebra::Vector3d pose; // x, y, heading
 };
+
+bool shutdown_req = false;
+void signalHandler(int /* signum */) { shutdown_req = true; }
 
 int main(int argc, char **argv) {
     // ecl::CmdLine cmd_line("chirp", ' ', "0.2");
@@ -99,8 +149,19 @@ int main(int argc, char **argv) {
 
     // KobukiManager kobuki_manager(device_port.getValue());
     // ecl::Sleep()(5);
-    KobukiManager kobuki_manager("/dev/kobuki");
-    kobuki_manager.spin();
-
+    try {
+        KobukiManager kobuki_manager("/dev/kobuki");
+        kobuki_manager.spin();
+        ecl::Sleep sleep(1);
+        ecl::linear_algebra::Vector3d pose; // x, y, heading
+        while (!shutdown_req) {
+            sleep();
+            pose = kobuki_manager.getPose();
+            // std::cout << "current pose: [" << pose[0] << ", " << pose[1] <<
+            // ", " << pose[2] << "]" << std::endl;
+        }
+    } catch (ecl::StandardException &e) {
+        std::cout << e.what();
+    }
     return 0;
 }
