@@ -124,6 +124,7 @@ class KobukiManager {
         ecl::Sleep sleep(1);
         while (true) {
             sleep();
+            wcli.sync();
         }
     }
 
