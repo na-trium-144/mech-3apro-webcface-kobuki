@@ -1,9 +1,16 @@
 # webcface-kobuki sample
 
 ## 環境構築
-* ubuntu20の場合
+* ubuntu20の場合gcc-10必須
 ```sh
 sudo apt install git cmake build-essential gcc-10 g++-10 python3.8-venv
+```
+* ~~windowsの場合、python3.8必須 (`choco install python38`)~~
+  * dynamixel_driverのブランチ変えたので3.8じゃなくてもいいかもしれないが試してない
+* poetry (必須ではない)
+  * https://python-poetry.org/docs/#installing-with-the-official-installer にしたがってインストールし
+```sh
+poetry config virtualenvs.in-project true
 ```
 
 ## webcface
@@ -81,4 +88,12 @@ make -Cbuild
 ./build/main
 ```
 
-別ターミナルで `webcface-server`
+## dynamixel
+* dynamixel_driverは [kindsenior/dynamixel_motor](https://github.com/kindsenior/dynamixel_motor/tree/noetic-support-python3) のコピー (そのままインストールするにはROSが必要だった)
+
+```sh
+cd dynamixel
+# poetry env use python3.8
+poetry install
+poetry run jupyter lab
+```

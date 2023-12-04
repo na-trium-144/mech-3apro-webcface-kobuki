@@ -4,3 +4,6 @@ build/
 /kobuki/install/
 /kobuki/log/
 .vscode/
+poetry.lock
+__pycache__/
+.ipynb_checkpoints/
