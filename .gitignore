@@ -3,3 +3,4 @@ build/
 /kobuki/src/
 /kobuki/install/
 /kobuki/log/
+.vscode/

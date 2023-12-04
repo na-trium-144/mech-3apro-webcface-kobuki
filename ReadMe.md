@@ -1,18 +1,13 @@
+# webcface-kobuki sample
+
+## 環境構築
+* ubuntu20の場合
+```sh
+sudo apt install git cmake build-essential gcc-10 g++-10 python3.8-venv
+```
+
 ## webcface
 https://github.com/na-trium-144/webcface
-```sh
-sudo apt install cmake gcc-10 g++-10 libspdlog-dev
-git submodule update --init --recursive
-cd webcface
-CC=gcc-10 CXX=g++-10 cmake -Bbuild
-make -Cbuild -j8
-sudo make -Cbuild install
-curl -LO https://github.com/na-trium-144/webcface-webui/releases/download/v1.0.10/webcface-webui_1.0.10.tar.gz
-tar zxvf webcface-webui*.tar.gz
-sudo rm -rf /usr/local/share/webcface
-sudo mkdir /usr/local/share/webcface
-sudo mv dist /usr/local/share/webcface/dist
-```
 
 ## kobuki
 * [install](https://kobuki.readthedocs.io/en/devel/software.html)
@@ -20,10 +15,11 @@ sudo mv dist /usr/local/share/webcface/dist
 
 * ubuntu20では
 ```sh
-sudo apt install python3.8-venv
 cd kobuki
 source venv.bash
 ```
+<details><summary>windowsでは</summary>
+
 * windowsでは
 	* git for windowsが必要
 	* developer command promptでやる
@@ -51,11 +47,13 @@ else()
   )
 endif()
 ```
-	* kobuki\src\ecl_core\ecl_geometry\include\ecl\geometry\angle.hpp の41,55,115,138行目の`ecl_geometry_PUBLIC`を削除
-  * kobuki\src\kobuki_core\include\kobuki_core\macros.hpp の31行目`kobuki_EXPORTS`→`kobuki_core_EXPORTS`
-  * kobuki\src\kobuki_core\CMakeLists.txt に`add_compile_options(/permissive-)`追加
-  * kobuki\src\kobuki_core\include\kobuki_core\logging.hpp に`#undef ERROR`追加
-  * kobuki\src\kobuki_core\src\driver\kobuki.cpp の57行目`0.0/0.0`→`std::numeric_limits<double>::quiet_NaN()`
+* kobuki\src\ecl_core\ecl_geometry\include\ecl\geometry\angle.hpp の41,55,115,138行目の`ecl_geometry_PUBLIC`を削除
+* kobuki\src\kobuki_core\include\kobuki_core\macros.hpp の31行目`kobuki_EXPORTS`→`kobuki_core_EXPORTS`
+* kobuki\src\kobuki_core\CMakeLists.txt に`add_compile_options(/permissive-)`追加
+* kobuki\src\kobuki_core\include\kobuki_core\logging.hpp に`#undef ERROR`追加
+* kobuki\src\kobuki_core\src\driver\kobuki.cpp の57行目`0.0/0.0`→`std::numeric_limits<double>::quiet_NaN()`
+* (これでもまだ通らない)
+</details>
 * 以降共通でビルド
 ```sh
 mkdir src
