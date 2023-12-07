@@ -97,3 +97,26 @@ cd dynamixel
 poetry install
 poetry run jupyter lab
 ```
+
+## OpenNI
+<details><summary>やめた</summary>
+* Visual Studio Installerで「最新の v142 ビルドツール用 C++ MFC (x86 および x64)」を追加する。
+* OpenNI/Include/XnPlatform.h の56-58行をコメントアウト
+* OpenNI/Platform/Win32/Build/OpenNI.sln を開き、ソリューションのビルド
+* OpenNI/Platform/Win32/Driver/Binにあるドライバーをインストールする
+<details><summary>READMEの手順どおりにインストールしようとするとうまくいかない</summary>
+
+* OpenNI/Platform/Win32/CreateRedist/RedistMaker.bat の38行目を `python Redist_OpenNi.py %1 %2 %3 %4` にする
+```cmd
+pip install pywin32
+cd OpenNI\Platform\Win32\CreateRedist
+RedistMaker.bat y 64 y
+```
+* めっちゃエラーが出る
+</details>
+</details>
+
+## Kinect
+* [Kinect for Windows SDK v1.8](https://www.microsoft.com/en-us/download/details.aspx?id=40278)
+  * 指示に従ってDeveloper Toolkit もインストール
+* Toolkitを起動しサンプルコードをインストール
