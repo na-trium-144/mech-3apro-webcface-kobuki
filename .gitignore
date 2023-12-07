@@ -7,6 +7,8 @@ build/
 Debug/
 Release/
 poetry.lock
-/kobuki/src/
+/kobuki/src/*/
+!/kobuki/src/webcface/
+!/kobuki/src/kobuki_webcface/
 /kobuki/install/
 /kobuki/log/

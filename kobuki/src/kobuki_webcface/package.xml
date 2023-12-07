@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<package format="3">
+	<name>kobuki_webcface</name>
+	<version>1.0.0</version>
+	<description>hoge</description>
+	<maintainer email="hoge@example.com">na-trium-144</maintainer>
+	<license>MIT</license>
+	<depend>webcface</depend>
+	<depend>kobuki_core</depend>
+</package>

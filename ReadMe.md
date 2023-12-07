@@ -5,6 +5,7 @@
 ```sh
 sudo apt install git cmake build-essential gcc-10 g++-10 python3.8-venv
 ```
+* 環境変数に`CC=gcc-10`と`CXX=g++-10`をセット
 * ~~windowsの場合、python3.8必須 (`choco install python38`)~~
   * dynamixel_driverのブランチ変えたので3.8じゃなくてもいいかもしれないが試してない
 * poetry (必須ではない)
@@ -17,9 +18,11 @@ poetry config virtualenvs.in-project true
 https://github.com/na-trium-144/webcface
 
 ## kobuki
-* [install](https://kobuki.readthedocs.io/en/devel/software.html)
-* [creating app](https://kobuki.readthedocs.io/en/devel/applications.html)
-
+* 参考リンク
+  * [install](https://kobuki.readthedocs.io/en/devel/software.html)
+  * [creating app](https://kobuki.readthedocs.io/en/devel/applications.html)
+* webcfaceをsrcに入れてcolconでいっしょにビルドする。
+  * `git submodule update --init --recursive`が必要。
 * ubuntu20では
 ```sh
 cd kobuki
@@ -61,13 +64,15 @@ endif()
 * kobuki\src\kobuki_core\src\driver\kobuki.cpp の57行目`0.0/0.0`→`std::numeric_limits<double>::quiet_NaN()`
 * (これでもまだ通らない)
 </details>
+
 * 以降共通でビルド
 ```sh
 mkdir src
 vcs import src < kobuki_standalone.repos
-colcon build --merge-install --packages-up-to kobuki_core --cmake-args -DBUILD_TESTING=OFF --cmake-args -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON
+colcon build --merge-install --packages-up-to kobuki_webcface --cmake-args -DBUILD_TESTING=OFF
 deactivate
 ```
+* windowsでは` --cmake-args -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON`
 * python3.9以降ではエラーになるがその場合は `pip install setuptools==58.2.0` で通る ([stackoverflow](https://stackoverflow.com/questions/75211362/import-distutils-command-bdist-wininst-as-orig))
 
 ## kobuki_test_app
@@ -80,6 +85,10 @@ make -Cbuild
 ```
 
 ## kobuki_webcface
+* 別でcmakeしていたが、kobuki_coreといっしょにcolconでビルドすることにした
+
+<details><summary>pure cmake</summary>
+
 ```sh
 source kobuki/install/setup.bash
 cd kobuki_webcface
@@ -87,6 +96,7 @@ CC=gcc-10 CXX=g++-10 cmake -Bbuild
 make -Cbuild
 ./build/main
 ```
+</details>
 
 ## dynamixel
 * dynamixel_driverは [kindsenior/dynamixel_motor](https://github.com/kindsenior/dynamixel_motor/tree/noetic-support-python3) のコピー (そのままインストールするにはROSが必要だった)
