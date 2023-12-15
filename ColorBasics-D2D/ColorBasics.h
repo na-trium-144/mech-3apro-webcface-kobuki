@@ -9,6 +9,8 @@
 #include "resource.h"
 #include "NuiApi.h"
 #include "ImageRenderer.h"
+#define WEBCFACE_USE_OPENCV 1
+#include <webcface/webcface.h>
 
 class CColorBasics
 {
@@ -70,6 +72,8 @@ private:
     HANDLE                  m_pColorStreamHandle;
     HANDLE                  m_hNextColorFrameEvent;
 
+    webcface::Client wcli;
+
     /// <summary>
     /// Main processing function
     /// </summary>
@@ -102,4 +106,5 @@ private:
     /// <param name="lpszFilePath">full file path to output bitmap to</param>
     /// <returns>S_OK on success, otherwise failure code</returns>
     HRESULT                 SaveBitmapToFile(BYTE* pBitmapBits, LONG lWidth, LONG lHeight, WORD wBitsPerPixel, LPCTSTR lpszFilePath);
+
 };

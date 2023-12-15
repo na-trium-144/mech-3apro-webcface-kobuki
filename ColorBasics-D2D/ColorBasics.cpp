@@ -9,6 +9,7 @@
 #include "ColorBasics.h"
 #include "resource.h"
 
+
 /// <summary>
 /// Entry point for the application
 /// </summary>
@@ -32,9 +33,7 @@ CColorBasics::CColorBasics() :
     m_hNextColorFrameEvent(INVALID_HANDLE_VALUE),
     m_pColorStreamHandle(INVALID_HANDLE_VALUE),
     m_bSaveScreenshot(false),
-    m_pNuiSensor(NULL)
-{
-}
+    m_pNuiSensor(NULL), wcli("kinect") {}
 
 /// <summary>
 /// Destructor
@@ -358,6 +357,13 @@ void CColorBasics::ProcessColor()
     {
         // Draw the data with Direct2D
         m_pDrawColor->Draw(static_cast<BYTE *>(LockedRect.pBits), LockedRect.size);
+
+        {
+            webcface::ImageFrame f{cColorHeight, cColorWidth, LockedRect.pBits,
+                                   webcface::ImageColorMode::rgba};
+            wcli.image("color").set(f);
+            wcli.sync();
+        }
 
         // If the user pressed the screenshot button, save a screenshot
         if (m_bSaveScreenshot)

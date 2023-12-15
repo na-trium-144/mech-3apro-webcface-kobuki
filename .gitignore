@@ -12,3 +12,4 @@ poetry.lock
 !/kobuki/src/kobuki_webcface/
 /kobuki/install/
 /kobuki/log/
+/opencv/
