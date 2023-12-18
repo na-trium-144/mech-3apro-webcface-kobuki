@@ -28,7 +28,7 @@ https://github.com/na-trium-144/webcface
 cd kobuki
 source venv.bash
 ```
-<details><summary>windowsでは</summary>
+<details><summary>windowsではいろいろと修正が必要</summary>
 
 * windowsでは
 	* git for windowsが必要
@@ -72,10 +72,12 @@ vcs import src < kobuki_standalone.repos
 colcon build --merge-install --packages-up-to kobuki_webcface --cmake-args -DBUILD_TESTING=OFF
 deactivate
 ```
-* windowsでは` --cmake-args -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON`
+* windowsでは` --cmake-args -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON`を追加
 * python3.9以降ではエラーになるがその場合は `pip install setuptools==58.2.0` で通る ([stackoverflow](https://stackoverflow.com/questions/75211362/import-distutils-command-bdist-wininst-as-orig))
 
 ## kobuki_test_app
+<details><summary>kobukiの動作確認のために作ったが今は不要</summary>
+
 ```sh
 source kobuki/install/setup.bash
 cd kobuki_test_app
@@ -83,11 +85,12 @@ cmake -Bbuild
 make -Cbuild
 ./build/main
 ```
+</details>
 
 ## kobuki_webcface
 * 別でcmakeしていたが、kobuki_coreといっしょにcolconでビルドすることにした
 
-<details><summary>pure cmake</summary>
+<details><summary>colconをつかわない場合 (今は不要)</summary>
 
 ```sh
 source kobuki/install/setup.bash
@@ -108,6 +111,14 @@ poetry install
 poetry run jupyter lab
 ```
 
+## ik
+* ロボットモデルを取り出すためにROSが要る。
+```sh
+rosrun xacro xacro robot.urdf.xacro > robot.urdf
+```
+* をしたものが ik/robot.urdf
+
+
 ## OpenNI
 <details><summary>やめた</summary>
 * Visual Studio Installerで「最新の v142 ビルドツール用 C++ MFC (x86 および x64)」を追加する。
@@ -127,6 +138,9 @@ RedistMaker.bat y 64 y
 </details>
 
 ## Kinect
-* [Kinect for Windows SDK v1.8](https://www.microsoft.com/en-us/download/details.aspx?id=40278)
-  * 指示に従ってDeveloper Toolkit もインストール
-* Toolkitを起動しサンプルコードをインストール
+* ~~[Kinect for Windows SDK v1.8](https://www.microsoft.com/en-us/download/details.aspx?id=40278)~~
+  * ~~指示に従ってDeveloper Toolkit もインストール~~
+  * ~~Toolkitを起動しサンプルコードをインストール~~
+* ↑をして改変したものがColorBasics-D2D/ColorBasics-D2D.sln これを開いてビルド
+  * ColorBasics-D2D/webcface に画像送信機能を追加したものがあり、ColorBasics-D2D.slnからそれを参照してビルドしている
+  * slnを開く前にそのwebcfaceディレクトリを開いてCMakeする必要がある
