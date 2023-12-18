@@ -13,3 +13,5 @@ poetry.lock
 /kobuki/install/
 /kobuki/log/
 /opencv/
+*.dll
+*.xml
