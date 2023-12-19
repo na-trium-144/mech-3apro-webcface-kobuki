@@ -110,31 +110,39 @@ cd dynamixel
 poetry install
 poetry run jupyter lab
 ```
+* dynamixel/dynamixel_webcface.ipynbを実行
+
+### pybullet
+* [quickstart guide](https://docs.google.com/document/d/10sXEhzFRSnvFcl3XxNGhnD4N2SedqwdAvK3dsihxVUA/edit#heading=h.2ye70wns7io3)
+* dynamixel/bullet.ipynbを実行
 
 ## ik
 * ロボットモデルを取り出すためにROSが要る。
+* ROSが使えるubuntuで
 ```sh
 rosrun xacro xacro robot.urdf.xacro > robot.urdf
 ```
 * をしたものが ik/robot.urdf
+* ik/webcface_matlab.mlx をごにょごにょしてwebcfaceをビルド、インポート
+* ik/arm_test.mlx は直接角度を指定してwebcfaceに送る
+* ik/webcface_sample.mlx は逆運動学計算してwebcfaceに送る
 
 
 ## OpenNI
 <details><summary>やめた</summary>
+
 * Visual Studio Installerで「最新の v142 ビルドツール用 C++ MFC (x86 および x64)」を追加する。
 * OpenNI/Include/XnPlatform.h の56-58行をコメントアウト
 * OpenNI/Platform/Win32/Build/OpenNI.sln を開き、ソリューションのビルド
 * OpenNI/Platform/Win32/Driver/Binにあるドライバーをインストールする
-<details><summary>READMEの手順どおりにインストールしようとするとうまくいかない</summary>
-
-* OpenNI/Platform/Win32/CreateRedist/RedistMaker.bat の38行目を `python Redist_OpenNi.py %1 %2 %3 %4` にする
+* READMEの手順どおりにインストールしようとするとうまくいかない
+  * OpenNI/Platform/Win32/CreateRedist/RedistMaker.bat の38行目を `python Redist_OpenNi.py %1 %2 %3 %4` にする
 ```cmd
 pip install pywin32
 cd OpenNI\Platform\Win32\CreateRedist
 RedistMaker.bat y 64 y
 ```
-* めっちゃエラーが出る
-</details>
+  * めっちゃエラーが出る
 </details>
 
 ## Kinect
@@ -144,3 +152,4 @@ RedistMaker.bat y 64 y
 * ↑をして改変したものがColorBasics-D2D/ColorBasics-D2D.sln これを開いてビルド
   * ColorBasics-D2D/webcface に画像送信機能を追加したものがあり、ColorBasics-D2D.slnからそれを参照してビルドしている
   * slnを開く前にそのwebcfaceディレクトリを開いてCMakeする必要がある
+

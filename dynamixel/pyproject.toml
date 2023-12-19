@@ -10,6 +10,7 @@ python = "~3.8"
 jupyter = "^1.0.0"
 pyserial = "^3.5"
 webcface = {path = "../webcface-python"}
+pybullet = "^3.2.6"
 
 [build-system]
 requires = ["poetry-core"]
