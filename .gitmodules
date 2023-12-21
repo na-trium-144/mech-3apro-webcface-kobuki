@@ -5,6 +5,3 @@
 	path = kobuki/src/webcface
 	url = https://github.com/na-trium-144/webcface.git
 
-[submodule "kinect/webcface"]
-	path = ColorBasics-D2D/webcface
-	url = https://github.com/na-trium-144/webcface.git
