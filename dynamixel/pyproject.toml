@@ -6,11 +6,12 @@ authors = ["na-trium-144 <100704180+na-trium-144@users.noreply.github.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "~3.8"
+python = "^3.8"
 jupyter = "^1.0.0"
 pyserial = "^3.5"
 pybullet = "^3.2.6"
 webcface = {path = "../webcface-python"}
+numpy = "^1.0"
 
 [build-system]
 requires = ["poetry-core"]
