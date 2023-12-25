@@ -13,9 +13,18 @@ function libDef = definewebcface()
 libDef = clibgen.LibraryDefinition("webcfaceData.xml");
 
 %% OutputFolder and Libraries 
-libDef.OutputFolder = "/home/kou/projects/mech-jishupro/ik";
-libDef.Libraries = [ "/home/kou/projects/mech-jishupro/kobuki/src/webcface/build/libwebcface.so" "/home/kou/projects/mech-jishupro/kobuki/src/webcface/build/_deps/spdlog-build/libspdlog.so" ];
-
+libDef.OutputFolder = ".";
+if ispc
+    libDef.Libraries = [
+        "..\kobuki\src\webcface\out\build\x64-Release\webcface.dll", ...
+        "..\kobuki\src\webcface\out\build\x64-Release\spdlog.dll"
+    ];
+elseif isunix
+    libDef.Libraries = [
+        "../kobuki/src/webcface/build/libwebcface.so", ...
+        "../kobuki/src/webcface/build/_deps/spdlog-build/libspdlog.so"
+    ];
+end
 %% C++ class |wcfMultiVal| with MATLAB name |clib.webcface.wcfMultiVal| 
 wcfMultiValDefinition = addClass(libDef, "wcfMultiVal", "MATLABName", "clib.webcface.wcfMultiVal", ...
     "Description", "clib.webcface.wcfMultiVal    Representation of C++ class wcfMultiVal."); % Modify help description values as needed.
