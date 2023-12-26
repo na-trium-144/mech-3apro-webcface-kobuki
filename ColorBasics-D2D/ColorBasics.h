@@ -9,7 +9,6 @@
 #include "resource.h"
 #include "NuiApi.h"
 #include "ImageRenderer.h"
-#define WEBCFACE_USE_OPENCV 1
 #include <webcface/webcface.h>
 
 class CColorBasics

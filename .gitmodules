@@ -5,3 +5,6 @@
 	path = kobuki/src/webcface
 	url = https://github.com/na-trium-144/webcface.git
 
+[submodule "webcface-windows-package"]
+	path = webcface-windows-package
+	url = git@github.com:na-trium-144/webcface-windows-package
