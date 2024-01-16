@@ -1,16 +1,24 @@
 # webcface-kobuki sample
 
 ## 環境構築
-* wsl1のubuntu20をインストール
+* windowsで行う (たぶんubuntuでもいける)
+* wsl1のubuntu20をインストール (kobukiがusbにアクセスするため)
 * ubuntu20の場合はgcc-10必須
 ```sh
 sudo apt install git cmake build-essential gcc-10 g++-10 python3.8-venv
 ```
+* ~~msys2をインストール、msys2内で以下~~
+```sh
+pacman -Syu
+pacman -S git pactoys
+pacboy -S gcc:p cmake:p ninja:p
+```
 * visual studioをインストール (学科pcには2019が入っている)
-* python3をインストール
+* python3をインストール(wslではなくwindows側)
   * ~~windowsの場合、python3.8必須~~
     * dynamixel_driverのブランチ変えたので3.8じゃなくてもいいかもしれないが試してない
-  * msys2にpythonが入っている場合は消す
+  * python3.10以降がよい (3.8だとcolconでエラーが大量に出る)
+  * msys2にpythonが入っている場合は消す(`pacman -R python`,`pacboy -R python:p`)
 * matlabをインストール
 * poetry (必須ではない)
   * https://python-poetry.org/docs/#installing-with-the-official-installer にしたがってインストールし
@@ -28,7 +36,8 @@ poetry config virtualenvs.in-project true
   * [creating app](https://kobuki.readthedocs.io/en/devel/applications.html)
 * webcfaceをsrcに入れてcolconでいっしょにビルドする。
   * `git submodule update --init --recursive`が必要。
-* ubuntu20では
+
+### ubuntu20
 ```sh
 cd kobuki
 source venv.bash
@@ -38,12 +47,30 @@ export CXX=g++-10
 * python3.9以降ではエラーになるがその場合は `pip install setuptools==58.2.0` で通る ([stackoverflow](https://stackoverflow.com/questions/75211362/import-distutils-command-bdist-wininst-as-orig))
 ```sh
 vcs import src < kobuki_standalone.repos
-colcon build --merge-install --packages-up-to kobuki_webcface --cmake-args -DBUILD_TESTING=OFF -DWEBCFACE_USE_OPENCV=off
+colcon build --merge-install --packages-up-to kobuki_webcface --cmake-args -DBUILD_TESTING=OFF -DWEBCFACE_USE_OPENCV=off --no-warn-unused-cli -Wno-dev
 ```
 
-* windows (mingw)はusbにアクセスできないらしいので使わない
+### windows (mingw)
 
-<details><summary>windows(msvc)ではいろいろと修正が必要</summary>
+<details><summary>ビルドできなかった</summary>
+* kobukiはmingwを想定して作られてないのでエラー解決のためフラグをいろいろ追加
+```sh
+cd kobuki
+python3.10 -m venv .venv
+export PYTHONPATH="$(pwd)/.venv/Lib/site-packages:$(pwd)/install/Lib/site-packages"
+cmd //k .\\.venv\\Scripts\\activate.bat
+pip install wheel
+pip install setuptools==58.2.0 vcstool==0.2.14 colcon-common-extensions==0.2.1
+vcs import src < kobuki_standalone.repos
+colcon build --merge-install --packages-up-to kobuki_webcface --cmake-args -DBUILD_TESTING=OFF -DWEBCFACE_USE_OPENCV=OFF -DWEBCFACE_FIND_LIBS=OFF "-DCMAKE_CXX_FLAGS=-Wno-unused-parameter -Wno-narrowing" -DECL_PLATFORM_HAS_POSIX_THREADS=FALSE -DECL_PLATFORM_HAS_WIN32_THREADS=TRUE -GNinja --no-warn-unused-cli -Wno-dev
+```
+* まだちょっとエラー出る
+
+</details>
+
+### windows (msvc)
+
+<details><summary>ビルドできなかった</summary>
 
 * msvcでは
 	* git for windowsが必要

@@ -4,17 +4,21 @@ if ispc
 
     interfaceGenerationFiles = "..\kobuki\src\webcface\src\include\webcface\c_wcf.h";
     libraries = [
-        "..\kobuki\src\webcface\out\build\x64-Release\spdlog.dll", ...
-        "..\kobuki\src\webcface\out\build\x64-Release\webcface.dll"
+        ... "..\kobuki\src\webcface\out\build\x64-Release\spdlog.dll", ...
+        ... "..\kobuki\src\webcface\out\build\x64-Release\webcface5.dll"
+        "C:\Program Files\WebCFace\bin\spdlog.dll", ...
+        "C:\Program Files\WebCFace\bin\webcface5.dll"
     ];
     outputFolder = ".";
 elseif isunix
     % Set up compiler - g++
     mex -setup:g++;
 
-    interfaceGenerationFiles = "/home/kou/projects/mech-jishupro/kobuki/src/webcface/src/include/webcface/c_wcf.h";
-    libraries = ["/home/kou/projects/mech-jishupro/kobuki/src/webcface/build/libwebcface.so", ...
-       "/home/kou/projects/mech-jishupro/kobuki/src/webcface/build/_deps/spdlog-build/libspdlog.so"];
+    interfaceGenerationFiles = "../kobuki/src/webcface/src/include/webcface/c_wcf.h";
+    libraries = [
+        "../kobuki/src/webcface/build/libwebcface.so", ...
+        "../kobuki/src/webcface/build/_deps/spdlog-build/libspdlog.so"
+    ];
     outputFolder = ".";
 else
     error('ライブ タスクは現在のプラットフォーム用に構成されていません')
@@ -31,12 +35,17 @@ clibgen.generateLibraryDefinition(interfaceGenerationFiles, ...
     "TreatConstCharPointerAsCString",true, ...
     "Verbose",true);
 
+addpath webcface
+try
+    clibConfiguration('webcface').unload
+catch exception
+end
+rmdir webcface s
 
-libraryDefinitionFromTask = definewebcface2();
+libraryDefinitionFromTask = definewebcface2(libraries);
 summary(libraryDefinitionFromTask)
-clibConfiguration('webcface').unload
+
 build(libraryDefinitionFromTask)
-addpath("webcface");
 additionalRuntimeDependencies = ""; % Optionally specify run-time dependencies needed per platform
 additionalRuntimeFolders = ""; % Optionally specify run-time folders needed per platform
 if isunix

@@ -9,22 +9,13 @@
 
 %% Setup
 % Do not edit this setup section.
-function libDef = definewebcface()
+function libDef = definewebcface2(libraries)
 libDef = clibgen.LibraryDefinition("webcfaceData.xml");
 
 %% OutputFolder and Libraries 
 libDef.OutputFolder = ".";
-if ispc
-    libDef.Libraries = [
-        "..\kobuki\src\webcface\out\build\x64-Release\webcface.dll", ...
-        "..\kobuki\src\webcface\out\build\x64-Release\spdlog.dll"
-    ];
-elseif isunix
-    libDef.Libraries = [
-        "../kobuki/src/webcface/build/libwebcface.so", ...
-        "../kobuki/src/webcface/build/_deps/spdlog-build/libspdlog.so"
-    ];
-end
+libDef.Libraries = libraries;
+
 %% C++ class |wcfMultiVal| with MATLAB name |clib.webcface.wcfMultiVal| 
 wcfMultiValDefinition = addClass(libDef, "wcfMultiVal", "MATLABName", "clib.webcface.wcfMultiVal", ...
     "Description", "clib.webcface.wcfMultiVal    Representation of C++ class wcfMultiVal."); % Modify help description values as needed.
@@ -275,6 +266,57 @@ defineArgument(wcfFuncRunDefinition, "arg_size", "int32");
 defineArgument(wcfFuncRunDefinition, "result", "clib.webcface.wcfMultiVal", "output", 1);
 defineOutput(wcfFuncRunDefinition, "RetVal", "int32");
 validate(wcfFuncRunDefinition);
+
+%% C++ function |wcfFuncRunAsync| with MATLAB name |clib.webcface.wcfFuncRunAsync|
+% C++ Signature: wcfStatus wcfFuncRunAsync(wcfClient * wcli,char const * member,char const * field,wcfMultiVal const * args,int arg_size,wcfAsyncFuncResult * * result)
+
+wcfFuncRunAsyncDefinition = addFunction(libDef, ...
+    "wcfStatus wcfFuncRunAsync(wcfClient * wcli,char const * member,char const * field,wcfMultiVal const * args,int arg_size,wcfAsyncFuncResult * * result)", ...
+    "MATLABName", "clib.webcface.wcfFuncRunAsync", ...
+    "Description", "clib.webcface.wcfFuncRunAsync Representation of C++ function wcfFuncRunAsync." + newline + ...
+    "関数を非同期で呼び出す", ...
+    "DetailedDescription", "This content is from the external library documentation."); % Modify help description values as needed.
+defineArgument(wcfFuncRunAsyncDefinition, "wcli", "clib.webcface.wcfClient", "input", 1, "Description", "wcli Clientポインタ"); % <MLTYPE> can be primitive type, user-defined type, clib.array type, or a list of existing typedef names for void*.
+defineArgument(wcfFuncRunAsyncDefinition, "member", "string", "input", "nullTerminated", "Description", "member memberの名前");
+defineArgument(wcfFuncRunAsyncDefinition, "field", "string", "input", "nullTerminated", "Description", "field funcの名前");
+defineArgument(wcfFuncRunAsyncDefinition, "args", "clib.array.webcface.wcfMultiVal", "input", "arg_size", "Description", "args 引数の配列"); % <MLTYPE> can be "clib.webcface.wcfMultiVal", or "clib.array.webcface.wcfMultiVal"
+defineArgument(wcfFuncRunAsyncDefinition, "arg_size", "int32", "Description", "arg_size 引数の個数");
+defineArgument(wcfFuncRunAsyncDefinition, "result", "clib.webcface.wcfAsyncFuncResult", "output", 1, "Description", "result 結果を格納する変数(wcfAsyncFuncResult*)へのポインタ"); % <MLTYPE> can be an existing typedef name for void* or a new typedef name to void*.
+defineOutput(wcfFuncRunAsyncDefinition, "RetVal", "int32", "Description", "wcliが無効ならWCF_BAD_WCLI");
+validate(wcfFuncRunAsyncDefinition);
+
+%% C++ function |wcfFuncGetResult| with MATLAB name |clib.webcface.wcfFuncGetResult|
+% C++ Signature: wcfStatus wcfFuncGetResult(wcfAsyncFuncResult * async_res,wcfMultiVal * * result)
+
+wcfFuncGetResultDefinition = addFunction(libDef, ...
+    "wcfStatus wcfFuncGetResult(wcfAsyncFuncResult * async_res,wcfMultiVal * * result)", ...
+    "MATLABName", "clib.webcface.wcfFuncGetResult", ...
+    "Description", "clib.webcface.wcfFuncGetResult Representation of C++ function wcfFuncGetResult." + newline + ...
+    "非同期で呼び出した関数の実行結果を取得", ...
+    "DetailedDescription", "This content is from the external library documentation."); % Modify help description values as needed.
+defineArgument(wcfFuncGetResultDefinition, "async_res", "clib.webcface.wcfAsyncFuncResult", "input", 1, "Description", "async_res 関数呼び出しに対応するAsyncFuncResult"); % <MLTYPE> can be primitive type, user-defined type, clib.array type, or a list of existing typedef names for void*.
+defineArgument(wcfFuncGetResultDefinition, "result", "clib.webcface.wcfMultiVal", "output", 1, "Description", "result 結果を格納する変数(wcfMultiVal*)へのポインタ");
+defineOutput(wcfFuncGetResultDefinition, "RetVal", "int32", "Description", "async_resが無効な場合 WCF_BAD_HANDLE," + newline + ...
+    "対象のmemberやfieldが存在しない場合 WCF_NOT_FOUND," + newline + ...
+    "関数で例外が発生した場合 WCF_EXCEPTION," + newline + ...
+    "まだ結果が返ってきていない場合 WCF_NOT_RETURNED");
+validate(wcfFuncGetResultDefinition);
+
+%% C++ function |wcfFuncWaitResult| with MATLAB name |clib.webcface.wcfFuncWaitResult|
+% C++ Signature: wcfStatus wcfFuncWaitResult(wcfAsyncFuncResult * async_res,wcfMultiVal * * result)
+
+wcfFuncWaitResultDefinition = addFunction(libDef, ...
+    "wcfStatus wcfFuncWaitResult(wcfAsyncFuncResult * async_res,wcfMultiVal * * result)", ...
+    "MATLABName", "clib.webcface.wcfFuncWaitResult", ...
+    "Description", "clib.webcface.wcfFuncWaitResult Representation of C++ function wcfFuncWaitResult." + newline + ...
+    "非同期で呼び出した関数の実行完了まで待機し、結果を取得", ...
+    "DetailedDescription", "This content is from the external library documentation."); % Modify help description values as needed.
+defineArgument(wcfFuncWaitResultDefinition, "async_res", "clib.webcface.wcfAsyncFuncResult", "input", 1, "Description", "async_res 関数呼び出しに対応するAsyncFuncResult"); % <MLTYPE> can be primitive type, user-defined type, clib.array type, or a list of existing typedef names for void*.
+defineArgument(wcfFuncWaitResultDefinition, "result", "clib.webcface.wcfMultiVal", "output", 1, "Description", "result 結果を格納する変数(wcfMultiVal*)へのポインタ");
+defineOutput(wcfFuncWaitResultDefinition, "RetVal", "int32", "Description", "async_resが無効な場合 WCF_BAD_HANDLE," + newline + ...
+    "対象のmemberやfieldが存在しない場合 WCF_NOT_FOUND," + newline + ...
+    "関数で例外が発生した場合 WCF_EXCEPTION");
+validate(wcfFuncWaitResultDefinition);
 
 %% C++ function |wcfFuncListen| with MATLAB name |clib.webcface.wcfFuncListen|
 % C++ Signature: wcfStatus wcfFuncListen(wcfClient * wcli,char const * field,wcfValType const * arg_types,int arg_size,wcfValType return_type)

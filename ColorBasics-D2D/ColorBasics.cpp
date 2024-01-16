@@ -201,7 +201,9 @@ LRESULT CALLBACK CColorBasics::DlgProc(HWND hWnd, UINT message, WPARAM wParam, L
             HRESULT hr = m_pDrawColor->Initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(long));
             if (FAILED(hr))
             {
-                SetStatusMessage(L"Failed to initialize the Direct2D draw device.");
+                WCHAR msg[] = L"Failed to initialize the Direct2D draw "
+                              L"device.";
+                SetStatusMessage(msg);
             }
 
             // Look for a connected Kinect, and create it if found
@@ -292,7 +294,8 @@ HRESULT CColorBasics::CreateFirstConnected()
 
     if (NULL == m_pNuiSensor || FAILED(hr))
     {
-        SetStatusMessage(L"No ready Kinect found!");
+        WCHAR msg[] = L"No ready Kinect found!";
+        SetStatusMessage(msg);
         return E_FAIL;
     }
 

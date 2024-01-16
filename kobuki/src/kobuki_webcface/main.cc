@@ -190,8 +190,12 @@ int main(int argc, char **argv) {
 
     // KobukiManager kobuki_manager(device_port.getValue());
     // ecl::Sleep()(5);
+    if (argc < 2) {
+        std::cerr << "please specify port" << std::endl;
+        return 1;
+    }
     try {
-        KobukiManager kobuki_manager("/dev/kobuki");
+        KobukiManager kobuki_manager(argv[1]);
         kobuki_manager.spin();
     } catch (ecl::StandardException &e) {
         std::cout << e.what();
