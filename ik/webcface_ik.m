@@ -60,6 +60,7 @@ x = x0;
 y = y0;
 z = z0;
 while true
+    
     [ret, h] = clib.webcface.wcfFuncFetchCall(wcli, "setDest");
     if ret == 0
         x = h.args(1).as_double;

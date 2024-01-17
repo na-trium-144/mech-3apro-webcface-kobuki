@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.5)
+project(3a_pro_controller LANGUAGES CXX)
+find_package(webcface CONFIG)
+add_executable(main main.cc)
+target_link_libraries(main webcface::webcface)
+if(MSVC)
+    target_compile_options(main PUBLIC /utf-8)
+endif()

@@ -8,7 +8,7 @@ enabled = true
 
   [[launcher.command]]
   name = "Kobuki"
-  exec = 'wsl bash -c "source install/setup.bash && kobuki_webcface"'
+  exec = 'wsl bash -c "source install/setup.bash && kobuki_webcface /dev/ttyS7"'
   workdir = "C:\\Users\\mech-user\\3a_pro\\kobuki"
 
   [[launcher.command]]
