@@ -2,9 +2,9 @@
 enabled = true
 
   [[launcher.command]]
-  name = "Kinect"
-  exec = "C:\\Users\\mech-user\\3a_pro\\ColorBasics-D2D\\x64\\Debug\\ColorBasics-D2D.exe"
-  workdir = "C:\\Users\\mech-user\\3a_pro\\ColorBasics-D2D\\x64\\Debug"
+  name = "controller"
+  exec = "C:\\Users\\mech-user\\3a_pro\\controller\\build\\Debug\\main.exe"
+  workdir = "C:\\Users\\mech-user\\3a_pro\\controller\\build\\Debug"
 
   [[launcher.command]]
   name = "Kobuki"
@@ -22,11 +22,6 @@ enabled = true
   workdir = "C:\\Users\\mech-user\\3a_pro\\dynamixel"
 
   [[launcher.command]]
-  name = "ik_bullet"
-  exec = 'matlab -batch "webcface_ik(1)"'
-  workdir = "C:\\Users\\mech-user\\3a_pro\\ik"
-
-  [[launcher.command]]
-  name = "ik_kobuki"
-  exec = 'matlab -batch "webcface_ik(0)"'
-  workdir = "C:\\Users\\mech-user\\3a_pro\\ik"
+  name = "Kinect"
+  exec = "C:\\Users\\mech-user\\3a_pro\\ColorBasics-D2D\\x64\\Debug\\ColorBasics-D2D.exe"
+  workdir = "C:\\Users\\mech-user\\3a_pro\\ColorBasics-D2D\\x64\\Debug"
