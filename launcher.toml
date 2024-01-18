@@ -1,0 +1,29 @@
+[[command]]
+name = "Kinect"
+exec = "C:\\Users\\mech-user\\3a_pro\\ColorBasics-D2D\\x64\\Debug\\ColorBasics-D2D.exe"
+workdir = "C:\\Users\\mech-user\\3a_pro\\ColorBasics-D2D\\x64\\Debug"
+
+[[command]]
+name = "Kobuki"
+exec = 'wsl bash -c "source install/setup.bash && kobuki_webcface /dev/ttyS7"'
+workdir = "C:\\Users\\mech-user\\3a_pro\\kobuki"
+
+[[command]]
+name = "bullet"
+exec = "C:\\Users\\mech-user\\AppData\\Roaming\\Python\\Scripts\\poetry run python C:\\Users\\mech-user\\3a_pro\\dynamixel\\bullet.py"
+workdir = "C:\\Users\\mech-user\\3a_pro\\dynamixel"
+
+[[command]]
+name = "dynamixel"
+exec = "C:\\Users\\mech-user\\AppData\\Roaming\\Python\\Scripts\\poetry run python C:\\Users\\mech-user\\3a_pro\\dynamixel\\dynamixel_webcface.py"
+workdir = "C:\\Users\\mech-user\\3a_pro\\dynamixel"
+
+[[command]]
+name = "ik_bullet"
+exec = 'matlab -batch "webcface_ik(1)"'
+workdir = "C:\\Users\\mech-user\\3a_pro\\ik"
+
+[[command]]
+name = "ik_kobuki"
+exec = 'matlab -batch "webcface_ik(0)"'
+workdir = "C:\\Users\\mech-user\\3a_pro\\ik"

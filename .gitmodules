@@ -8,3 +8,6 @@
 [submodule "webcface-windows-package"]
 	path = webcface-windows-package
 	url = https://github.com/na-trium-144/webcface-windows-package
+[submodule "webcface-tools"]
+	path = webcface-tools
+	url = https://github.com/na-trium-144/webcface-tools

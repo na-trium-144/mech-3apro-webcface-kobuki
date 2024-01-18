@@ -5,41 +5,21 @@
 #include <numbers>
 
 int main(int argc, char **argv){
-    if(argc < 2){
-        std::wcerr << L"引数に0または1" << std::endl;
-        return 1;
-    }
-    bool is_sim = (std::string(argv[1]) == "1");
+    // if(argc < 2){
+    //     std::wcerr << L"引数に0または1" << std::endl;
+    //     return 1;
+    // }
+    // bool is_sim = (std::string(argv[1]) == "1");
 
     webcface::Client wcli("controller");
 
     using namespace webcface::ViewComponents;
     double servo_diff = 0.02;
-    auto v = wcli.view("control");
-    v.add("kobuki　　　　dynamixel\n");
-    v.add("　　");
-    v.add(button("↑", [&]{wcli.member("kobuki").func("baseControl").run(0.1, 0);}));
-    v.add("　　　　");
-    v.add(button("↑", [&]{wcli.member("matlab-test").func("setDestDiff").run(0, 0, servo_diff);}));
-    v.add("　　");
-    v.add(button("x↑", [&]{wcli.member("matlab-test").func("setDestDiff").run(servo_diff, 0, 0);}));
-    v.add("\n");
-    v.add(button("←", [&]{wcli.member("kobuki").func("baseControl").run(0, 0.1);}));
-    v.add(button("×", [&]{wcli.member("kobuki").func("baseControl").run(0, 0);}));
-    v.add(button("→", [&]{wcli.member("kobuki").func("baseControl").run(0, -0.1);}));
-    v.add(" ");
-    v.add(button("←", [&]{wcli.member("matlab-test").func("setDestDiff").run(0, servo_diff, 0);}));
-    v.add("　");
-    v.add(button("→", [&]{wcli.member("matlab-test").func("setDestDiff").run(0, -servo_diff, 0);}));
-    v.add("\n");
-    v.add("　　");
-    v.add(button("↓", [&]{wcli.member("kobuki").func("baseControl").run(-0.1, 0);}));
-    v.add("　　　　");
-    v.add(button("↓", [&]{wcli.member("matlab-test").func("setDestDiff").run(0, 0, -servo_diff);}));
-    v.add("　　");
-    v.add(button("x↓", [&]{wcli.member("matlab-test").func("setDestDiff").run(-servo_diff, 0, 0);}));
-    v.add("\n");
-    v.sync();
+    double kobuki_move = 0, kobuki_move_diff = 0.1;
+    double kobuki_rot = 0, kobuki_rot_diff = 0.3;
+
+    auto kobuki = wcli.member("kobuki");
+    auto matlab = wcli.member("matlab-test");
 
     auto robot = wcli.robotModel("turtlebot");
     using namespace webcface::RobotJoints;
@@ -51,7 +31,7 @@ int main(int argc, char **argv){
             cylinder({{0, 0, 0}, {0, -pi/2, 0}}, 0.178, 0.11)},
         {"plate_top_link",
             fixedAbsolute({{0, 0, 0.4}, {0, 0, 0}}),
-            circle(webcface::identity(), 0.178)},
+            cylinder({{0, 0, 0}, {0, -pi/2, 0}}, 0.178, 0.01)},
         {"pole1",
             fixedAbsolute({{-0.05, -0.15, 0}, {0, 0, 0}}),
             cylinder({{0, 0, 0}, {0, -pi/2, 0}}, 0.005, 0.4)},
@@ -125,11 +105,87 @@ int main(int argc, char **argv){
     }
 
     while(true){
+        for(int i = 1; i <= 7; i++){
+            if(matlab.value("q/" + std::to_string(i)).tryGet()){
+                conf["arm_joint" + std::to_string(i)] = matlab.value("q/" + std::to_string(i)).get();
+            }
+        }
         auto world = wcli.canvas3D("world");
         world.add(plane(webcface::identity(), 10, 10), webcface::ViewColor::white);
         world.add(line(webcface::identity(), {10, 0, 0}), webcface::ViewColor::red);
         world.add(robot, webcface::identity(), conf);
+        world.add(
+            sphere(webcface::identity(), 0.02),
+            {{matlab.value("x"), matlab.value("y"), matlab.value("z")}, {0, 0, 0}},
+            webcface::ViewColor::red);
         world.sync();
+
+        auto v = wcli.view("control");
+        v << "kobuki ";
+        if(kobuki.value("emergency").tryGet()){
+            if(kobuki.value("emergency").get()){
+                v << text("停止中").textColor(webcface::ViewColor::red);
+            }else{
+                v << text("ok").textColor(webcface::ViewColor::green);
+            }
+            v << button("緊急停止", wcli.member("kobuki").func("emergencyOn"))
+                    .bgColor(kobuki.value("emergency").get()
+                                ? webcface::ViewColor::gray
+                                : webcface::ViewColor::red)
+              << button("解除", wcli.member("kobuki").func("emergencyOff"))
+                    .bgColor(kobuki.value("emergency").get()
+                                ? webcface::ViewColor::yellow
+                                : webcface::ViewColor::gray);
+        }
+        v << std::endl;
+        auto kobuki_update = [&, kobuki]{
+            kobuki.func("baseControl").runAsync(kobuki_move, 0);
+        };
+        auto up = button("↑", [&]{
+            kobuki_move += kobuki_move_diff;
+            kobuki_update();
+        });
+        auto down = button("↓", [&]{
+            kobuki_move -= kobuki_move_diff;
+            kobuki_update();
+        });
+        auto left = button("←", [&]{
+            kobuki_rot += kobuki_rot_diff;
+            kobuki_update();
+        });
+        auto right = button("→", [&]{
+            kobuki_rot -= kobuki_rot_diff;
+            kobuki_update();
+        });
+        auto stop = button("×", [&]{
+            kobuki_move = 0;
+            kobuki_rot = 0;
+            kobuki_update();
+        });
+        v << "　　" << up << "　　　" << "linear = " << kobuki_move << std::endl;
+        v << left << stop << right <<"　angular = " << kobuki_rot << std::endl;
+        v << "　　" << down << std::endl;
+        v << std::endl;
+
+        v << "dynamixel (matlab)"
+          << button("Free", wcli.member("dynamixel").func("free_servo"))
+                .bgColor(webcface::ViewColor::red)
+          << std::endl;
+        v << "x = " << matlab.value("x");
+        v << ", y = " << matlab.value("y");
+        v << ", z = " << matlab.value("z") << std::endl;
+        auto set_dest = matlab.func("setDestDiff");
+        auto zplus = button("↑", [=]{set_dest.runAsync(0, 0, servo_diff);});
+        auto zminus = button("↓", [=]{set_dest.runAsync(0, 0, -servo_diff);});
+        auto yplus = button("←", [=]{set_dest.runAsync(0, servo_diff, 0);});
+        auto yminus = button("→", [=]{set_dest.runAsync(0, -servo_diff, 0);});
+        auto xplus = button("前↑", [=]{set_dest.runAsync(servo_diff, 0, 0);});
+        auto xminus = button("後↓", [=]{set_dest.runAsync(-servo_diff, 0, 0);});
+        v << xplus << "　　　" << zplus << std::endl;
+        v << "　　　　" << yplus << "　　" << yminus << std::endl;
+        v << xminus << "　　　" << zminus << std::endl;
+
+        v.sync();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         wcli.sync();

@@ -6,9 +6,9 @@ if ispc
     libraries = [
         ... "..\kobuki\src\webcface\out\build\x64-Release\spdlog.dll", ...
         ... "..\kobuki\src\webcface\out\build\x64-Release\webcface5.dll"
-        "C:\Program Files\WebCFace\bin\spdlog.dll", ...
         "C:\Program Files\WebCFace\bin\webcface5.dll"
     ];
+    do_copy = 0;
     outputFolder = ".";
 elseif isunix
     % Set up compiler - g++
@@ -19,6 +19,7 @@ elseif isunix
         "../kobuki/src/webcface/build/libwebcface.so", ...
         "../kobuki/src/webcface/build/_deps/spdlog-build/libspdlog.so"
     ];
+    do_copy = 1;
     outputFolder = ".";
 else
     error('ライブ タスクは現在のプラットフォーム用に構成されていません')
@@ -54,7 +55,9 @@ if isunix
         "../kobuki/src/webcface/build/_deps/spdlog-build/libspdlog.so.1.12"
     ];
 end
-libraryDefinitionFromTask.copyRuntimeDependencies( ...
-    AdditionalRuntimeDependencies=additionalRuntimeDependencies, ...
-    AdditionalRuntimeFolders=additionalRuntimeFolders, ...
-    Verbose=true);
+if do_copy == 1
+    libraryDefinitionFromTask.copyRuntimeDependencies( ...
+        AdditionalRuntimeDependencies=additionalRuntimeDependencies, ...
+        AdditionalRuntimeFolders=additionalRuntimeFolders, ...
+        Verbose=true);
+end

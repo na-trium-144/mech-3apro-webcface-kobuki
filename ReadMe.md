@@ -190,3 +190,5 @@ RedistMaker.bat y 64 y
   * ~~slnを開く前にそのwebcfaceディレクトリを開いてCMakeする必要がある~~
   * webcfaceはインストールされているものを使う
 
+## controller
+* cmakeしてビルド

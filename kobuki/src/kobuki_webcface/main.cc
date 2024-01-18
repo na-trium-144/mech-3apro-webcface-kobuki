@@ -70,6 +70,8 @@ class KobukiManager {
                 }
             })
             .setArgs({webcface::Arg("linear"), webcface::Arg("angular")});
+        wcli.func("emergencyOn").set([this]{emergencyOn();});
+        wcli.func("emergencyOff").set([this]{emergencyOff();});
         updateView();
         wcli.start();
     }
@@ -95,6 +97,8 @@ class KobukiManager {
           << std::endl;
         v << button("解除", [this] { emergencyOff(); });
         v.sync();
+
+        wcli.value("emergency").set(!kobuki.isEnabled());
     }
 
     ~KobukiManager() {

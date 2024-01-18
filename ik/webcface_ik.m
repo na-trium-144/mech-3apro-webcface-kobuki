@@ -19,7 +19,7 @@ robot = importrobot("robot.urdf");
 q = homeConfiguration(robot);
 dof = length(q);
 
-p0 = tform2trvec(getTransform(robot, q, "arm_link5_link", "base_link"));
+p0 = tform2trvec(getTransform(robot, q, "arm_link6_link", "base_link"));
 x0 = p0(1)
 y0 = p0(2)
 z0 = p0(3)
@@ -28,7 +28,7 @@ z0 = p0(3)
 ik = inverseKinematics('RigidBodyTree', robot);
 weights = [0, 0, 0, 1, 1, 1];
 %weights = [1, 1, 1, 1, 1, 1];
-endEffector = 'arm_link5_link';
+endEffector = 'arm_link6_link';
 
 if is_sim
     target = "bullet-sim"
@@ -56,11 +56,17 @@ clib.webcface.wcfFuncListen(wcli, "setDest", [4, 4, 4], 0)
 clib.webcface.wcfFuncListen(wcli, "setDestDiff", [4, 4, 4], 0)
 r = rateControl(5);
 clib.webcface.wcfSync(wcli)
-x = x0;
-y = y0;
-z = z0;
+x = x0 + 0.;
+y = y0 + 0.;
+z = z0 + 0.;
 while true
-    
+    clib.webcface.wcfValueSet(wcli, "x", x);
+    clib.webcface.wcfValueSet(wcli, "y", y);
+    clib.webcface.wcfValueSet(wcli, "z", z);
+    for j = 1:7
+        clib.webcface.wcfValueSet(wcli, "q/" + string(j), q(j).JointPosition);
+    end
+    clib.webcface.wcfSync(wcli);
     [ret, h] = clib.webcface.wcfFuncFetchCall(wcli, "setDest");
     if ret == 0
         x = h.args(1).as_double;
