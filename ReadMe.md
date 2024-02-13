@@ -53,6 +53,7 @@ colcon build --merge-install --packages-up-to kobuki_webcface --cmake-args -DBUI
 ### windows (mingw)
 
 <details><summary>ビルドできなかった</summary>
+
 * kobukiはmingwを想定して作られてないのでエラー解決のためフラグをいろいろ追加
 ```sh
 cd kobuki
