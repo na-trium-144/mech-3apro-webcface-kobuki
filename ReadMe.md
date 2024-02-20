@@ -193,3 +193,12 @@ RedistMaker.bat y 64 y
 
 ## controller
 * cmakeしてビルド
+
+## EusLisp
+
+```lisp
+(load "load-webcface.l")
+(setq *wcli* (wcf-init-default "sample"))
+(wcf-value-set *wcli* "test" 12345) ;; value("test").set(12345)
+(wcf-sync *wcli*)
+```
